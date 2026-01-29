@@ -1,1 +1,55 @@
-Resposta das perguntas
+
+Parte 4: Perguntas Conceituais
+Responda brevemente, explicando os conceitos com suas próprias palavras:
+1. Qual a diferença entre uma interface e uma classe abstrata em Java? Dê um exemplo de uso apropriado para cada
+se eu quero que os objetos implemente todos os metodos eu utilizo uma interface, se eu tenho alguns metodos chave que eu quero implementar eu uso classe abstrata. ex de interface: quando eu quero obrigar as classes a implementarem todos os métodos eu utilizo uma interface, isso acontece no ClienteRepository, onde todo repositório de cliente deve ter as funcionalidades do JpaRepository. Quando eu quero ter alguns métodos já implementados, utilizo uma classe abstrata. Exemplo: se eu quisesse um validador de email, eu poderia usar uma classe abstrata para trazer as regras prontas, que serviriam apenas para serem herdadas
+
+2. Explique o que é injeção de dependências e como o Spring a implementa.
+
+É o conceito de quando uma classe nao cria sozinha suas proprias dependencias, ela recebe elas prontas. O spring implementa a partir das anotações.
+
+3. Qual a diferença entre JPA e JDBC? Quais as vantagens de usar JPA?
+
+JPA é um método de gerenciar o banco de dados de mais alto nivel comparado ao JDBC, invés de ter que escrever cada comando SQL, o JPA faz boa parte automaticamente, sem a necessidade de criar result Sets, conns e especificar o comando sql.
+
+4. Explique o que é Maven e para que serve o arquivo pom.xml.
+Maven é o tipo de gerenciador de dependencias mais utilizado atualmente, o arquivo pom.xml especifica exatamente quais as dependencias dos projetos, o spring initializer faz isso de forma automatica e eficiente.
+
+5. Explique brevemente o ciclo de vida de uma entidade JPA (estados: Transient, Managed, Detached, Removed).
+Transient é o objeto que acabou de ser criado e nao tem associacao ao banco nem JPA ainda. Managed é quando o objeto está sendo gerenciado pelo JPA. Detached é quando ele ja foi gerenciado e o JPA nao está mais sob o seu dominio. e Removed é quando o oobjeto esta na fase final e ira ser excluido do banco.
+
+6. Qual a diferença entre EAGER e LAZY loading em JPA? Quando usar cada um?
+O EAGER trás todos os dados relacionados juntos quando a entidade for buscada, já o lazy só trás so os dados relacionados que eu pedir pra ele trazer. 
+
+
+Parte 5: Resolução de Problemas
+
+Cenário: "Um usuário relata que ao cadastrar um cliente com email inválido (sem '@' ou sem domínio após o '@'), o sistema Pegasus está aceitando o cadastro sem
+validação. Isso está gerando problemas no envio de notificações automáticas."
+Descreva:
+1. Investigação:
+Investigação: Como você investigaria o problema? Quais camadas do sistema você verificaria e em que ordem? Primeiro eu iria no Service para checar a validação do metodo adicionar, depois no entity para checar o método emailValido().
+
+2. Identificação:
+Identificação: Onde você implementaria a validação? Justifique sua escolha entre:
+Camada de apresentação (Controller)
+Camada de serviço (Service)
+Camada de persistência (Entity)
+Pode ser em mais de uma camada
+
+
+eu aplicaria na service pois lá que ficam as regras de negócio, entao tem que passar por lá independente de onde venha ( e foi onde implementei no programa que desenvolvi)
+
+3. Implementação:
+Implementação: Escreva um trecho de código mostrando como você faria uma validação mais robusta de email (pode usar regex ou outra abordagem)
+
+no projeto foi implementada uma validaçao básica de de if, suficiente para identificar erros simples, mas como melhoria seria possível utilizar regex para tornar a validação ainda melhor, apesar de já ter tido contato com regex no curso CS50, ainda não me senti totalmente confortável para aplicá-lo neste projeto, optando por uma solução mais simples. Mas com uma breve pesquisa descobri que poderia ser implementado a partir desse código:  
+ String regex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+  return email.matches(regex);
+
+4. Teste:
+Teste: Como você verificaria se a solução funciona corretamente?
+
+Eu verificaria a solução tentando cadastrar clientes com emails mal formatados  e entao confirmaria que o sistema impede o cadastro, 
+também testaria um email válido para garantir que o cadastro continue funcionando normalmente.
+   
