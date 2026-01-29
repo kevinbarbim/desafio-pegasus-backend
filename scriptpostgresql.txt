@@ -1,0 +1,103 @@
+
+CREATE SEQUENCE seq_cliente START 1;
+CREATE TABLE tb_cliente(
+id_cliente BIGINT PRIMARY KEY DEFAULT nextval('seq_cliente'),
+nome VARCHAR(100) NOT NULL,
+email VARCHAR(255) NOT NULL,
+data_cadastro TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+
+
+
+CREATE SEQUENCE seq_endereco START 1;
+
+CREATE TABLE tb_endereco (
+    id_endereco BIGINT PRIMARY KEY DEFAULT nextval('seq_endereco'),
+    id_cliente BIGINT NOT NULL,
+    tipo_endereco VARCHAR(20),
+    logradouro VARCHAR(200) NOT NULL,
+    numero VARCHAR(10),
+    complemento VARCHAR(100),
+    cep VARCHAR(9) NOT NULL,
+    cidade VARCHAR(100) NOT NULL,
+    estado CHAR(2) NOT NULL,
+    
+    --  Se apagar o cliente vai apagar os endereços
+    CONSTRAINT fk_cliente_endereco 
+        FOREIGN KEY (id_cliente) 
+        REFERENCES tb_cliente(id_cliente) 
+        ON DELETE CASCADE
+);
+
+
+
+
+INSERT INTO tb_cliente(nome, email, data_cadastro) values ('Kevin','kevin@gmail.com', NOW()-INTERVAL '45 days');
+INSERT INTO tb_cliente(nome, email, data_cadastro) values ('Paulo','paulo@gmail.com', NOW());
+
+
+
+
+INSERT INTO tb_endereco (
+    id_cliente, tipo_endereco, logradouro, numero, complemento,
+    cep, cidade, estado
+) VALUES (
+    1, 'RESIDENCIAL', 'Rua das Flores', '123', 'Casa',
+    '12345-678', 'São Paulo', 'SP'
+);
+
+INSERT INTO tb_endereco (
+    id_cliente, tipo_endereco, logradouro, numero, complemento,
+    cep, cidade, estado
+) VALUES (
+    2, 'COMERCIAL', 'Avenida Brasil', '1000', 'Sala 42',
+    '87654-321', 'Rio de Janeiro', 'RJ'
+);
+
+
+
+
+SELECT nome, data_cadastro FROM tb_cliente WHERE data_cadastro>=NOW() - INTERVAL '30 days' ORDER BY nome;
+
+SELECT 
+    c.nome, 
+    c.email, 
+    e.logradouro, 
+    e.cidade, 
+    e.tipo_endereco
+FROM tb_cliente c
+INNER JOIN tb_endereco e ON c.id_cliente = e.id_cliente
+ORDER BY c.nome ASC, e.tipo_endereco ASC;
+
+
+
+SELECT
+  c.nome,
+  COUNT(e.id_endereco) AS qtd_enderecos
+FROM tb_cliente c
+LEFT JOIN tb_endereco e ON c.id_cliente = e.id_cliente
+GROUP BY c.id_cliente, c.nome;
+
+SELECT 
+c.nome
+FROM tb_cliente c
+LEFT JOIN tb_endereco e ON c.id_cliente = e.id_cliente
+WHERE e.id_endereco IS NULL;
+
+SELECT 
+c.nome,
+COUNT(e.id_endereco) AS qtd_enderecos
+FROM tb_cliente c
+LEFT JOIN tb_endereco e ON c.id_cliente = e.id_cliente
+GROUP BY c.id_cliente, c.nome
+HAVING COUNT(e.id_endereco) > 1;
+
+
+SELECT 
+    e.cidade, 
+    COUNT(DISTINCT c.id_cliente) AS total_clientes
+FROM tb_endereco e
+JOIN tb_cliente c ON e.id_cliente = c.id_cliente
+GROUP BY e.cidade
+ORDER BY total_clientes DESC;
